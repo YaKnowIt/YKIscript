@@ -31,7 +31,9 @@ local change = menu.list(menu.my_root(), "Changelog")
 local heist = menu.list(menu.my_root(), "Heist Utilities")
 local displaylog = menu.list(menu.my_root(), "Displays and Logs")
 -- code starts here --
-
+menu.action(menu.my_root(), 'Restart Script', {}, 'Restarts the script to check for updates', function ()
+    util.restart_script()
+end)
 -- heist finishes --
 -- thanks Verruckt for the auto diamond --
 function SET_INT_GLOBAL(global, value)
