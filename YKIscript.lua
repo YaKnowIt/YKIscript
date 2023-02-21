@@ -31,6 +31,8 @@ local change = menu.list(menu.my_root(), "Changelog")
 local heist = menu.list(menu.my_root(), "Heist Utilities")
 local displaylog = menu.list(menu.my_root(), "Displays and Logs")
 -- code starts here --
+
+-- restart script button --
 menu.action(menu.my_root(), 'Restart Script', {}, 'Restarts the script to check for updates', function ()
     util.restart_script()
 end)
@@ -124,6 +126,8 @@ menu.action(displaylog, "Toast Godmode", {"toastgodmode"}, "Toast Godmode player
 
 
 menu.action(change, "[1.1] First Version, 3 Heist Scripts and 3 Display and Log Scripts.", {""}, "", function()
+end, true)
+menu.action(change, "[1.2] Added Restart Button", {""}, "", function()
 end, true)
 -- Code ends here --
 local end_time = util.current_time_millis()
