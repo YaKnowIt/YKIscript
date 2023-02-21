@@ -28,7 +28,7 @@ auto_updater.run_auto_update({
 })
 local start_time = util.current_time_millis()
 local change = menu.list(menu.my_root(), "Changelog")
-local heist = menu.list(menu.my_root(), "Heists Utilities")
+local heist = menu.list(menu.my_root(), "Heist Utilities")
 local displaylog = menu.list(menu.my_root(), "Displays and Logs")
 -- code starts here --
 
