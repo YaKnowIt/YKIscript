@@ -27,12 +27,13 @@ auto_updater.run_auto_update({
     verify_file_begins_with="--"
 })
 local start_time = util.current_time_millis()
+local change = menu.list(menu.my_root(), "Changelog")
+local heist = menu.list(menu.my_root(), "Heists Utilities")
+local displaylog = menu.list(menu.my_root(), "Displays and Logs")
 -- code starts here --
 
 -- heist finishes --
-
 -- thanks Verruckt for the auto diamond --
-local heist = menu.list(menu.my_root(), "Heists Utilities")
 function SET_INT_GLOBAL(global, value)
   memory.write_int(memory.script_global(global), value)
 end
@@ -80,8 +81,6 @@ menu.action(heist, "[?] Instant finish Doomsday", {"instadoom"}, "Will instantly
 end)
 
 --displays and logs--
-
-local displaylog = menu.list(menu.my_root(), "Displays and Logs")
 -- displays and logs languages of players --
 menu.action(displaylog, "Toast Everyones Language", {"toastlang"}, "Players language will be toasted and logged.", function()
   for i = 0, 31 do
@@ -121,6 +120,9 @@ menu.action(displaylog, "Toast Godmode", {"toastgodmode"}, "Toast Godmode player
     main()
       end, true)
 
+
+menu.action(change, "[1.1] First Version, 3 Heist Scripts and 3 Display and Log Scripts.", {""}, "", function()
+end, true)
 -- Code ends here --
 local end_time = util.current_time_millis()
 local load_time = end_time - start_time
