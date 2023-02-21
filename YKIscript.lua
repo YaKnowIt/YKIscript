@@ -55,7 +55,7 @@ function SET_INT_LOCAL(script, script_local, value)
       memory.write_int(memory.script_local(script, script_local), value)
   end
 end
-util.toast("Welcome to YKIscript. Version 1.3)
+util.toast("Welcome to YKIscript. Version 1.3")
 menu.action(heist, "[?] Instant finish Casino", {"instacasino"}, "Will instantly finish the Casino Heist.", function()
   menu.trigger_commands("scripthost")
   util.yield_once()
