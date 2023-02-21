@@ -55,6 +55,7 @@ function SET_INT_LOCAL(script, script_local, value)
       memory.write_int(memory.script_local(script, script_local), value)
   end
 end
+util.toast("Welcome to YKIscript. Version 1.3)
 menu.action(heist, "[?] Instant finish Casino", {"instacasino"}, "Will instantly finish the Casino Heist.", function()
   menu.trigger_commands("scripthost")
   util.yield_once()
@@ -128,6 +129,8 @@ menu.action(displaylog, "Toast Godmode", {"toastgodmode"}, "Toast Godmode player
 menu.action(change, "[1.1] First Version, 3 Heist Scripts and 3 Display and Log Scripts.", {""}, "", function()
 end, true)
 menu.action(change, "[1.2] Added Restart Button", {""}, "", function()
+end, true)
+menu.action(change, "[1.3] Added Welcome Message", {""}, "", function()
 end, true)
 -- Code ends here --
 local end_time = util.current_time_millis()
