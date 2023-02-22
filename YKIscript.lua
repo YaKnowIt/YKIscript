@@ -30,12 +30,49 @@ local start_time = util.current_time_millis()
 local change = menu.list(menu.my_root(), "Changelog")
 local heist = menu.list(menu.my_root(), "Heist Utilities")
 local displaylog = menu.list(menu.my_root(), "Displays and Logs")
+local propertytp = menu.list(menu.my_root(), "Property Teleports")
 -- code starts here --
-
 -- restart script button --
 menu.action(menu.my_root(), 'Restart Script', {}, 'Restarts the script to check for updates', function ()
-    util.restart_script()
+  util.restart_script()
 end)
+-- credit JerryScript --
+util.toast("Welcome to YKIscript. Version 1.4 coded for GTA:O version 1.66")
+util.yield(100)
+util.toast("Scanning GTA Version...")
+util.yield(500)
+local addr = memory.scan("4C 8D 05 ? ? ? ? 48 8D 15 ? ? ? ? 48 8B C8 E8 ? ? ? ? 48 8D 15 ? ? ? ? 48 8D 4C 24 20 E8")
+if addr == 0 then
+    util.toast("pattern scan failed")
+else
+    util.toast(memory.read_string(memory.rip(addr + 3)))
+end
+util.require_natives('1660775568-uno')
+local nativeNameSpaces = {
+  'HUD',
+}
+--credit to scriptCat (^-^)
+local function get_waypoint_v3()
+  if HUD.IS_WAYPOINT_ACTIVE() then
+      local blip = HUD.GET_FIRST_BLIP_INFO_ID(8)
+      local waypoint_pos = HUD.GET_BLIP_COORDS(blip)
+
+      local success, Zcoord = util.get_ground_z(waypoint_pos.x, waypoint_pos.y)
+      local tries = 0
+      while not success or tries <= 100 do
+          success, Zcoord = util.get_ground_z(waypoint_pos.x, waypoint_pos.y)
+          tries += 1
+          util.yield_once()
+      end
+      if success then
+          waypoint_pos.z = Zcoord
+      end
+
+      return waypoint_pos
+  else
+      util.toast('No waypoint set.')
+  end
+end
 -- heist finishes --
 -- thanks Verruckt for the auto diamond --
 function SET_INT_GLOBAL(global, value)
@@ -55,7 +92,6 @@ function SET_INT_LOCAL(script, script_local, value)
       memory.write_int(memory.script_local(script, script_local), value)
   end
 end
-util.toast("Welcome to YKIscript. Version 1.3")
 menu.action(heist, "[?] Instant finish Casino", {"instacasino"}, "Will instantly finish the Casino Heist.", function()
   menu.trigger_commands("scripthost")
   util.yield_once()
@@ -132,6 +168,87 @@ menu.action(change, "[1.2] Added Restart Button", {""}, "", function()
 end, true)
 menu.action(change, "[1.3] Added Welcome Message", {""}, "", function()
 end, true)
+menu.action(change, "[1.4] Changed Welcome Message and Added PropertyTP", {""}, "", function()
+end, true)
+
+
+-- property tp from JerryScript --
+local propertyBlips = {
+  [1] = { name = ('Ceo office'),   sprite = 475 },
+  [2] = { name = ('MC clubhouse'), sprite = 492,
+      subProperties = {listName = ('MC businesses'), properties = {
+          [1] = { name = ('Weed farm'),           sprite = 496 },
+          [2] = { name = ('Cocaine lockup'),      sprite = 497 },
+          [3] = { name = ('Document forgery'),    sprite = 498 },
+          [4] = { name = ('Methamphetamine Lab'), sprite = 499 },
+          [5] = { name = ('Counterfeit cash'),    sprite = 500 },
+      }}
+  },
+  [3] = { name = ('Bunker'),     sprite = 557 },
+  [4] = { name = ('Hangar'),     sprite = 569 },
+  [5] = { name = ('Facility'),   sprite = 590 },
+  [6] = { name = ('Night club'), sprite = 614 },
+  [7] = { name = ('Arcade'),     sprite = 740 },
+  [8] = { name = ('Auto shop'),  sprite = 779 },
+  [9] = { name = ('Agency'),     sprite = 826 },
+}
+
+local function getUserPropertyBlip(sprite)
+  local blip = HUD.GET_FIRST_BLIP_INFO_ID(sprite)
+  while blip ~= 0 do
+      local blipColour = HUD.GET_BLIP_COLOUR(blip)
+      if HUD.DOES_BLIP_EXIST(blip) and blipColour != 55 and blipColour != 3 then return blip end
+      blip = HUD.GET_NEXT_BLIP_INFO_ID(sprite)
+  end
+end
+
+local function tpToBlip(blip)
+  local pos = HUD.GET_BLIP_COORDS(blip)
+  local tpEntity = (PED.IS_PED_IN_ANY_VEHICLE(players.user_ped(), true) and my_cur_car or players.user_ped())
+  ENTITY.SET_ENTITY_COORDS(tpEntity, pos, false, false, false, false)
+end
+
+local propertyTpRefs = {}
+local function regenerateTpLocations(root)
+  for k, _ in pairs(propertyTpRefs) do
+      menu.delete(propertyTpRefs[k])
+      propertyTpRefs[k] = nil
+  end
+  for i = 1, #propertyBlips do
+      local propertyBlip = getUserPropertyBlip(propertyBlips[i].sprite)
+      if propertyBlip == nil then continue end
+
+      propertyTpRefs[propertyBlips[i].name] = menu.action(propertytp, propertyBlips[i].name, {}, '', function()
+          if not HUD.DOES_BLIP_EXIST(propertyBlip) then
+              util.toast('Couldn\'t find property.')
+              return
+          end
+          tpToBlip(propertyBlip)
+      end)
+      if propertyBlips[i].subProperties then
+          local subProperties = propertyBlips[i].subProperties
+          local listName = subProperties.listName
+          propertyTpRefs[listName] = menu.list(propertytp, listName, {}, '')
+          for j = 1, #subProperties.properties do
+              local subPropertyBlip = getUserPropertyBlip(subProperties.properties[j].sprite)
+              if propertyBlip == nil then continue end
+
+              menu.action(propertyTpRefs[listName], subProperties.properties[j].name, {}, '', function() --no need to have refs to these because they get deleted with the sublist
+                  if not HUD.DOES_BLIP_EXIST(propertyBlip) then
+                      util.toast('Couldn\'t find property.')
+                      return
+                  end
+                  tpToBlip(subPropertyBlip)
+              end)
+          end
+      end
+  end
+end
+
+menu.action(propertytp, "Property Teleports", {""}, "", function()
+  regenerateTpLocations('Property tp\'s')
+end)
+
 -- Code ends here --
 local end_time = util.current_time_millis()
 local load_time = end_time - start_time
